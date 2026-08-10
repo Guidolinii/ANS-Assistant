@@ -1,0 +1,2 @@
+# Dependências do ANS-Assistant
+# As dependências (ex.: langchain, streamlit, etc.) serão adicionadas em etapas posteriores.
