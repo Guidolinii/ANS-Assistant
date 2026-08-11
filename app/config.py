@@ -33,8 +33,17 @@ class Settings(BaseSettings):
     embedding_model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
     vectorstore_dir: Path = metadata_dir / "vectorstore"
 
+    # Configurações do LLM (Geração RAG)
+    llm_provider: str = "gemini"
+    llm_model_name: str = "gemini-flash-latest"
+    llm_temperature: float = 0.0
+    gemini_api_key: str = ""
+    openai_api_key: str = ""
+
+
 
 settings = Settings()
+
 
 
 

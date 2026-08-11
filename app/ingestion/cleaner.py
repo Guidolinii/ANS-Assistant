@@ -29,7 +29,11 @@ class TextCleaner:
         # Normalização Unicode NFKC (converte ligaduras como \ufb01 -> fi, \ufb02 -> fl, etc.)
         cleaned = unicodedata.normalize("NFKC", text)
 
+        # Remover caractere de combinação solto \u030a (combining ring) oriundo de PDFs
+        cleaned = cleaned.replace("\u030a", "")
+
         # Normalizar quebras de linha
+
         cleaned = cleaned.replace("\r\n", "\n").replace("\r", "\n")
 
         # Substituir caracteres de espaço não-quebrável (\xa0) e tabulações por espaço
