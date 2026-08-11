@@ -216,3 +216,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ANS-Assistant Data & Documents
+data/documents/*.pdf
+!data/documents/.gitkeep
+!data/documents/documents.json
+

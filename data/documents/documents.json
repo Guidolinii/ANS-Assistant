@@ -1,6 +1,6 @@
 {
-  "catalog_version": "1.0",
-  "description": "Catálogo inicial de fontes documentais oficiais da ANS e legislação da Saúde Suplementar para o pipeline RAG.",
+  "catalog_version": "1.1",
+  "description": "Catálogo inicial validado das fontes documentais oficiais da ANS e da Legislação Federal de Saúde Suplementar para o pipeline RAG.",
   "documents": [
     {
       "id": "RN-465-2021",
@@ -8,12 +8,19 @@
       "document_type": "Resolução Normativa",
       "norm_number": "465/2021",
       "issuing_body": "ANS - Agência Nacional de Saúde Suplementar",
+      "source_authority": "Agência Nacional de Saúde Suplementar (ANS)",
+      "source_type": "Resolução Normativa",
       "thematic_domain": "Cobertura",
       "effective_date": "2021-04-01",
-      "status": "Ativa com atualizações",
-      "official_url": "https://www.ans.gov.br/legislacao",
-      "description": "Regulamenta o Rol de Procedimentos e Eventos em Saúde no âmbito da Saúde Suplementar, definindo a cobertura assistencial mínima obrigatória para os planos de saúde. Sujeita a atualizações periódicas posteriores que possuem prioridade de vigência.",
-      "priority_notes": "Possui atualizações posteriores que devem ser tratadas com prioridade de vigência no pipeline de RAG."
+      "status": "Ativa com atualizações continuadas",
+      "version": "Norma-base de 2021 com atualizações vigentes integradas",
+      "official_url": "https://www.gov.br/ans/pt-br/assuntos/cobertura-e-finalidade-dos-planos/rol-de-procedimentos-e-eventos-em-saude",
+      "description": "Regulamenta o Rol de Procedimentos e Eventos em Saúde na Saúde Suplementar, definindo a cobertura assistencial mínima obrigatória para planos de saúde. Sujeita a atualizações e incorporações tecnológicas periódicas que possuem prioridade regulatória de vigência.",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "LEI-9656-1998",
+        "RN-566-2022"
+      ]
     },
     {
       "id": "RN-566-2022",
@@ -21,11 +28,19 @@
       "document_type": "Resolução Normativa",
       "norm_number": "566/2022",
       "issuing_body": "ANS - Agência Nacional de Saúde Suplementar",
+      "source_authority": "Agência Nacional de Saúde Suplementar (ANS)",
+      "source_type": "Resolução Normativa",
       "thematic_domain": "Garantia de Atendimento",
       "effective_date": "2022-12-30",
       "status": "Ativa",
-      "official_url": "https://www.ans.gov.br/legislacao",
-      "description": "Dispõe sobre a garantia de atendimento aos beneficiários de planos privados de assistência à saúde, estabelecendo prazos máximos para a prestação de serviços e regras para indisponibilidade de rede credenciada."
+      "version": "Texto Consolidado",
+      "official_url": "https://www.ans.gov.br/legislacao/act-search-results?schema=RN&number=566",
+      "description": "Dispõe sobre a garantia de atendimento aos beneficiários de planos privados de assistência à saúde, estabelecendo prazos máximos para atendimento e regras para indisponibilidade de rede prestadora e ressarcimento.",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "LEI-9656-1998",
+        "RN-465-2021"
+      ]
     },
     {
       "id": "RN-438-2018",
@@ -33,11 +48,19 @@
       "document_type": "Resolução Normativa",
       "norm_number": "438/2018",
       "issuing_body": "ANS - Agência Nacional de Saúde Suplementar",
+      "source_authority": "Agência Nacional de Saúde Suplementar (ANS)",
+      "source_type": "Resolução Normativa",
       "thematic_domain": "Portabilidade",
       "effective_date": "2019-06-03",
       "status": "Ativa",
-      "official_url": "https://www.ans.gov.br/legislacao",
-      "description": "Regulamenta o direito à portabilidade de carências para beneficiários de planos privados de assistência à saúde, definindo os requisitos, prazos e procedimentos para a migração entre planos sem novos períodos de carência."
+      "version": "Texto Consolidado",
+      "official_url": "https://www.ans.gov.br/legislacao/act-search-results?schema=RN&number=438",
+      "description": "Regulamenta o direito à portabilidade de carências para beneficiários de planos privados de assistência à saúde, definindo requisitos, prazos e procedimentos para a migração entre planos sem novos períodos de carência.",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "LEI-9656-1998",
+        "RN-557-2022"
+      ]
     },
     {
       "id": "RN-565-2022",
@@ -45,11 +68,19 @@
       "document_type": "Resolução Normativa",
       "norm_number": "565/2022",
       "issuing_body": "ANS - Agência Nacional de Saúde Suplementar",
+      "source_authority": "Agência Nacional de Saúde Suplementar (ANS)",
+      "source_type": "Resolução Normativa",
       "thematic_domain": "Reajustes",
       "effective_date": "2022-12-19",
       "status": "Ativa",
-      "official_url": "https://www.ans.gov.br/legislacao",
-      "description": "Regulamenta os critérios e regras para aplicação de reajustes de mensalidades em planos de saúde individuais, familiares e coletivos, bem como o agrupamento de contratos coletivos (pool de risco)."
+      "version": "Texto Consolidado",
+      "official_url": "https://www.ans.gov.br/legislacao/act-search-results?schema=RN&number=565",
+      "description": "Regulamenta os critérios e regras para aplicação de reajustes de mensalidades em planos de saúde individuais, familiares e coletivos, bem como o agrupamento de contratos coletivos para fins de cálculo de sinistralidade.",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "LEI-9656-1998",
+        "RN-557-2022"
+      ]
     },
     {
       "id": "RN-557-2022",
@@ -57,11 +88,20 @@
       "document_type": "Resolução Normativa",
       "norm_number": "557/2022",
       "issuing_body": "ANS - Agência Nacional de Saúde Suplementar",
+      "source_authority": "Agência Nacional de Saúde Suplementar (ANS)",
+      "source_type": "Resolução Normativa",
       "thematic_domain": "Contratação",
       "effective_date": "2022-12-15",
       "status": "Ativa",
-      "official_url": "https://www.ans.gov.br/legislacao",
-      "description": "Dispõe sobre a classificação e características dos planos privados de assistência à saúde, regulamentando suas modalidades de contratação (individual/familiar, coletivo empresarial e coletivo por adesão)."
+      "version": "Texto Consolidado",
+      "official_url": "https://www.ans.gov.br/legislacao/act-search-results?schema=RN&number=557",
+      "description": "Dispõe sobre a classificação e características dos planos privados de assistência à saúde, regulamentando suas modalidades de contratação (individual/familiar, coletivo empresarial e coletivo por adesão).",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "LEI-9656-1998",
+        "RN-565-2022",
+        "RN-438-2018"
+      ]
     },
     {
       "id": "LEI-9656-1998",
@@ -69,11 +109,22 @@
       "document_type": "Lei Federal",
       "norm_number": "9.656/1998",
       "issuing_body": "Presidência da República",
+      "source_authority": "Presidência da República / Casa Civil",
+      "source_type": "Lei Federal",
       "thematic_domain": "Legislação Geral da Saúde Suplementar",
       "effective_date": "1998-06-04",
-      "status": "Ativa",
+      "status": "Ativa com alterações",
+      "version": "Texto Consolidado/Compilado",
       "official_url": "https://www.planalto.gov.br/ccivil_03/leis/l9656.htm",
-      "description": "Dispõe sobre os planos e seguros privados de assistência à saúde no Brasil, estabelecendo o marco regulatório fundamental, direitos dos consumidores, obrigações das operadoras e regras gerais do setor."
+      "description": "Dispõe sobre os planos e seguros privados de assistência à saúde no Brasil, estabelecendo o marco regulatório fundamental, direitos dos consumidores, obrigações das operadoras e regras gerais do setor.",
+      "last_verified": "2026-08-11",
+      "related_documents": [
+        "RN-465-2021",
+        "RN-566-2022",
+        "RN-438-2018",
+        "RN-565-2022",
+        "RN-557-2022"
+      ]
     }
   ]
 }

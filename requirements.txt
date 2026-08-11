@@ -1,2 +1,5 @@
-# Dependências do ANS-Assistant
-# As dependências (ex.: langchain, streamlit, etc.) serão adicionadas em etapas posteriores.
+pypdf>=4.0.0
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+langchain-text-splitters>=0.0.1
+pytest>=8.0.0
