@@ -29,6 +29,12 @@ class Settings(BaseSettings):
     chunk_size: int = 1000
     chunk_overlap: int = 150
 
+    # Configurações de Embeddings e Banco Vetorial
+    embedding_model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"
+    vectorstore_dir: Path = metadata_dir / "vectorstore"
+
 
 settings = Settings()
+
+
 
