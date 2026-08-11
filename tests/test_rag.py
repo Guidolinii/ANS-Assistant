@@ -1,7 +1,16 @@
 """
 Suíte de testes automatizados para os módulos de Geração RAG (Etapa 4).
+
+Cobre:
+- Formatação de prompt e contexto
+- Extração de fontes
+- Suporte a retries com exponential backoff para falhas 503/429/Timeout
+- Ausência de retries para erros permanentes (401/400)
+- Resposta de fallback quando o contexto é insuficiente
+- Integração com ChatGoogleGenerativeAI (LangChain) via mocks
 """
 
+from unittest.mock import MagicMock, patch
 import pytest
 
 from app.generation.prompts import (
@@ -9,7 +18,7 @@ from app.generation.prompts import (
     RAGPromptBuilder,
     SYSTEM_PROMPT,
 )
-from app.generation.rag import RAGPipeline
+from app.generation.rag import SERVICE_UNAVAILABLE_MESSAGE, RAGPipeline
 
 
 @pytest.fixture
@@ -62,8 +71,9 @@ def test_rag_pipeline_extract_sources(sample_chunks):
 
 def test_rag_pipeline_generate_answer_fallback_context_vazio():
     """Valida que se o retriever não encontrar chunks, o pipeline retorna o fallback de contexto insuficiente."""
+
     class EmptyRetriever:
-        def retrieve(self, query: str, top_k: int = 5):
+        def retrieve(self, query: str, top_k: int = 10):
             return []
 
     pipeline = RAGPipeline(retriever=EmptyRetriever())
@@ -72,18 +82,103 @@ def test_rag_pipeline_generate_answer_fallback_context_vazio():
     assert result["answer"] == FALLBACK_INSUFFICIENT_CONTEXT
     assert result["chunks_count"] == 0
     assert len(result["sources"]) == 0
+    assert result["success"] is True
 
 
-def test_rag_pipeline_generate_answer_fluxo_completo(sample_chunks):
-    """Valida a execução do fluxo RAG completo com retriever mockado."""
+@patch("app.generation.rag.os.environ.get", return_value="fake_api_key")
+@patch("langchain_google_genai.ChatGoogleGenerativeAI")
+def test_rag_pipeline_langchain_integration(mock_chat_cls, mock_env_get, sample_chunks):
+    """Valida que o RAGPipeline utiliza ChatGoogleGenerativeAI do LangChain."""
+    mock_llm_instance = MagicMock()
+    mock_llm_instance.invoke.return_value = MagicMock(
+        content="Prazo de 7 dias úteis segundo Art. 3º."
+    )
+    mock_chat_cls.return_value = mock_llm_instance
+
     class DummyRetriever:
-        def retrieve(self, query: str, top_k: int = 5):
+        def retrieve(self, query: str, top_k: int = 10):
             return sample_chunks
 
     pipeline = RAGPipeline(retriever=DummyRetriever())
     result = pipeline.generate_answer("qual o prazo de pediatria?")
 
-    assert "answer" in result
-    assert result["chunks_count"] == 1
-    assert len(result["sources"]) == 1
-    assert result["sources"][0]["document_id"] == "RN-566-2022"
+    assert result["success"] is True
+    assert "7 dias úteis" in result["answer"]
+    mock_chat_cls.assert_called_once()
+    mock_llm_instance.invoke.assert_called_once()
+
+
+@patch("app.generation.rag.os.environ.get", return_value="fake_api_key")
+@patch("time.sleep")
+@patch("langchain_google_genai.ChatGoogleGenerativeAI")
+def test_rag_pipeline_retry_on_503_success(
+    mock_chat_cls, mock_sleep, mock_env_get, sample_chunks
+):
+    """Valida que em erro 503 temporário, o pipeline realiza retry e tem sucesso na 2ª tentativa."""
+    mock_llm_instance = MagicMock()
+    # 1ª chamada lança 503 UNAVAILABLE, 2ª chamada sucede
+    mock_llm_instance.invoke.side_effect = [
+        Exception("503 UNAVAILABLE: Model is overloaded"),
+        MagicMock(content="Resposta gerada após retry."),
+    ]
+    mock_chat_cls.return_value = mock_llm_instance
+
+    class DummyRetriever:
+        def retrieve(self, query: str, top_k: int = 10):
+            return sample_chunks
+
+    pipeline = RAGPipeline(retriever=DummyRetriever())
+    result = pipeline.generate_answer("pergunta teste")
+
+    assert result["success"] is True
+    assert result["answer"] == "Resposta gerada após retry."
+    assert mock_llm_instance.invoke.call_count == 2
+    mock_sleep.assert_called_once_with(2)  # Primeiro delay do backoff
+
+
+@patch("app.generation.rag.os.environ.get", return_value="fake_api_key")
+@patch("time.sleep")
+@patch("langchain_google_genai.ChatGoogleGenerativeAI")
+def test_rag_pipeline_retry_on_429_exhausted(
+    mock_chat_cls, mock_sleep, mock_env_get, sample_chunks
+):
+    """Valida que em erro 429 persistente por 3 tentativas, esgota retries e retorna mensagem amigável."""
+    mock_llm_instance = MagicMock()
+    mock_llm_instance.invoke.side_effect = Exception("429 RESOURCE_EXHAUSTED: Rate limit exceeded")
+    mock_chat_cls.return_value = mock_llm_instance
+
+    class DummyRetriever:
+        def retrieve(self, query: str, top_k: int = 10):
+            return sample_chunks
+
+    pipeline = RAGPipeline(retriever=DummyRetriever())
+    result = pipeline.generate_answer("pergunta teste")
+
+    assert result["success"] is False
+    assert result["answer"] == SERVICE_UNAVAILABLE_MESSAGE
+    assert mock_llm_instance.invoke.call_count == 3
+    assert mock_sleep.call_count == 2
+
+
+@patch("app.generation.rag.os.environ.get", return_value="fake_api_key")
+@patch("time.sleep")
+@patch("langchain_google_genai.ChatGoogleGenerativeAI")
+def test_rag_pipeline_no_retry_on_permanent_error(
+    mock_chat_cls, mock_sleep, mock_env_get, sample_chunks
+):
+    """Valida que para erros permanentes (ex: 401 API_KEY_INVALID), NÃO é feito retry."""
+    mock_llm_instance = MagicMock()
+    mock_llm_instance.invoke.side_effect = Exception("401 API_KEY_INVALID: Invalid key provided")
+    mock_chat_cls.return_value = mock_llm_instance
+
+    class DummyRetriever:
+        def retrieve(self, query: str, top_k: int = 10):
+            return sample_chunks
+
+    pipeline = RAGPipeline(retriever=DummyRetriever())
+    result = pipeline.generate_answer("pergunta teste")
+
+    assert result["success"] is False
+    assert "[ERRO DE CONFIGURAÇÃO]" in result["answer"]
+    assert mock_llm_instance.invoke.call_count == 1
+    mock_sleep.assert_not_called()

@@ -12,12 +12,11 @@ from pathlib import Path
 # Adicionar diretório raiz ao PYTHONPATH para permitir imports do pacote app
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from app.generation.prompts import FALLBACK_INSUFFICIENT_CONTEXT
 from app.generation.rag import RAGPipeline
 
 
 def run_ask(query: str, top_k: int = 10) -> None:
-
-
     """Executa o pipeline RAG e exibe a resposta e fontes no terminal."""
     if not query or not query.strip():
         print("[ERRO] Informe uma pergunta para obter a resposta do ANS-Assistant.")
@@ -40,23 +39,38 @@ def run_ask(query: str, top_k: int = 10) -> None:
     answer = result.get("answer", "")
     sources = result.get("sources", [])
     chunks_count = result.get("chunks_count", 0)
+    is_success = result.get("success", True)
+    is_fallback = answer == FALLBACK_INSUFFICIENT_CONTEXT
 
     print("\n[RESPOSTA FUNDAMENTADA DO LLM]:\n")
     print(answer)
     print("\n" + "-" * 80)
-    print(" FONTES OFICIAIS CITADAS:")
-    print("-" * 80)
 
-    if sources:
-        for idx, src in enumerate(sources, start=1):
-            doc_id = src.get("document_id", "")
-            title = src.get("title", "")
-            page = src.get("page_number", "N/A")
-            official_url = src.get("official_url", "")
-            print(f"  [{idx}] {title} ({doc_id}) — Página {page}")
-            print(f"      URL Oficial: {official_url}")
+    if not is_success:
+        print(" [STATUS]: Contexto recuperado com sucesso, porém a geração da resposta falhou.")
+        print("-" * 80)
+    elif is_fallback:
+        print(" CONTEXTO RECUPERADO (Sem correspondência suficiente na norma):")
+        print("-" * 80)
+        if sources:
+            for idx, src in enumerate(sources, start=1):
+                title = src.get("title", "")
+                page = src.get("page_number", "N/A")
+                official_url = src.get("official_url", "")
+                print(f"  [{idx}] {title} — Página {page}")
+                print(f"      URL Oficial: {official_url}")
     else:
-        print("  Nenhuma fonte correspondente encontrada.")
+        print(" FONTES UTILIZADAS (Contexto da RN 566/2022):")
+        print("-" * 80)
+        if sources:
+            for idx, src in enumerate(sources, start=1):
+                title = src.get("title", "")
+                page = src.get("page_number", "N/A")
+                official_url = src.get("official_url", "")
+                print(f"  [{idx}] {title} — Página {page}")
+                print(f"      URL Oficial: {official_url}")
+        else:
+            print("  Nenhuma fonte correspondente encontrada.")
 
     print(f"\n (Total de fragmentos normativos analisados: {chunks_count})")
     print("=" * 80 + "\n")
@@ -80,12 +94,11 @@ def main() -> None:
         help="Número de fragmentos recuperados para compor o contexto (padrão: 10).",
     )
 
-
     args = parser.parse_args()
 
     if not args.query:
         print("[AVISO] Nenhuma pergunta informada.")
-        print("Uso: python scripts/ask.py \"sua pergunta aqui\" [--top-k 5]\n")
+        print("Uso: python scripts/ask.py \"sua pergunta aqui\" [--top-k 10]\n")
         print("Exemplo de pergunta:")
         print("  python scripts/ask.py \"qual o prazo máximo para consulta médica em pediatria?\"")
         sys.exit(0)
